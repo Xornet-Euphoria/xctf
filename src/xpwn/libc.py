@@ -1,5 +1,6 @@
 from hashlib import sha1
 from xlog import XLog
+from .elf import search_elf
 
 
 libc_database = [
@@ -22,10 +23,34 @@ def _sha1(data):
     return sha1(data).hexdigest()
 
 
+def _sha1file(file):
+    with open(file, "rb") as f:
+        data = f.read()
+    return _sha1(data)
+
+
+def search_libc(dirname="./"):
+    ret = []
+    elfs = search_elf()
+
+    # identified from hash
+    for elf in elfs:
+        sha1hash = _sha1file(elf)
+
+        if get_libc_by_hash(sha1hash) is not None:
+            ret.append(elf)
+
+    # identified from name
+    if len(ret) == 0:
+        for elf in elfs:
+            if "libc" in str(elf):
+                ret.append(elf)
+
+    return ret
+
+
 def analyze_libc(libc_path):
-    f = open(libc_path, "rb")
-    data = f.read()
-    sha1hash = _sha1(data)
+    sha1hash = _sha1file(libc_path)
 
     libc = get_libc_by_hash(sha1hash)
 
