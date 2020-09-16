@@ -6,3 +6,5 @@ from .rcf import *
 from .lcg import *
 from .prime import *
 from .dlp import *
+from .vector import *
+from .lattice import *
