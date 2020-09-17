@@ -44,6 +44,9 @@ class Vector:
     def norm(self):
         return sqrt(dot_product(self, self))
 
+    def unpack(self):
+        return self.nums
+
 
 def dot_product(x, y):
     if x.length != y.length:
