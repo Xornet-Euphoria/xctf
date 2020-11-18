@@ -1,4 +1,6 @@
 from xcrypto.finitefield import FiniteField, Element
+from xcrypto.mod import crt
+from math import ceil, sqrt
 
 
 class ECPoint:
@@ -8,6 +10,12 @@ class ECPoint:
         if not curve.on_curve((x, y)):
             raise ValueError(f"({x}, {y}) is not on curve: {curve}")
         self.curve = curve
+
+    def unpack(self):
+        if self.is_o():
+            return (None, None)
+        else:
+            return (self.x.x, self.y.x)
 
     def __eq__(self, point):
         return self.curve == point.curve and self.x == point.x and self.y == point.y
@@ -24,6 +32,11 @@ class ECPoint:
 
     def is_o(self):
         return self.x is None and self.y is None
+
+    def __neg__(self):
+        if self.is_o():
+            return self
+        return self.__class__(self.x.x, -self.y.x, self.curve)
 
     def __add__(self, point):
         self.raise_different_curve_err(point)
@@ -86,3 +99,53 @@ class EllipticCurve:
 
     def get_o(self):
         return ECPoint(None, None, self)
+
+
+def bsgs(G, target, order, log=False):
+    m = ceil(sqrt(order))
+
+    d = {}
+    jG = G.curve.get_o()
+    for j in range(m):
+        _x, _y = jG.unpack()
+        d[_x] = (_y, j)
+        jG += G
+
+    if log:
+        print("[+] table is created.")
+
+    minus_mG = -(m * G)
+    rhs = target
+    for i in range(m):
+        _x, _y = rhs.unpack()
+        if _x in d and _y == d[_x][0]:
+            return i * m + d[_x][1]
+
+        rhs += minus_mG
+
+    return None
+
+
+def ec_pohlig_hellman(g, y, factorized_orders, log=False):
+    order = 1
+    for t in factorized_orders:
+        order *= pow(t[0], t[1])
+    xs = []
+    problem = []
+
+    for q, e in factorized_orders:
+        if log:
+            print(f"[+]: attempting {q}^{e}")
+        q_e = pow(q, e)
+        exp_i = order // q_e
+        g_i = exp_i * g
+        y_i = exp_i * y
+        x_i = bsgs(g_i, y_i, q_e, log)
+        if x_i is None:
+            if log:
+                print("[+] exponent is not found...")
+                return None
+        xs.append(x_i)
+        problem.append([x_i, q_e])
+
+    return crt(problem)
