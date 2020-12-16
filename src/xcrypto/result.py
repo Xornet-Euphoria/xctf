@@ -11,14 +11,13 @@ class FailureError(Exception):
 
 
 class Result():
-    self.__err_msg = "fail..."
+    def __init__(self, val, res=True):
+        self.__err_msg = "failed..."
 
-
-    def __init__(self, res, val):
-        self.__res = res
+        self.__res = SuccessOrFailure.SUCCESS if res else SuccessOrFailure.FAILURE
         self.__value = val
 
-    
+
     def isSuccess(self):
         return self.__res == SuccessOrFailure.SUCCESS
 
