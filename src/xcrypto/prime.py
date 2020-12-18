@@ -44,7 +44,7 @@ def create_sieve(n):
     sieve = [True for _ in range(n + 1)]
     sieve[0] = False
     sieve[1] = False
-    for i in range(2, floor(sqrt(n))):
+    for i in range(2, floor(sqrt(n)) + 1):
         if not sieve[i]:
             continue
 
@@ -56,7 +56,7 @@ def create_sieve(n):
 
 def create_spf_sieve(n):
     sieve = [i for i in range(n + 1)]
-    for i in range(2, floor(sqrt(n))):
+    for i in range(2, floor(sqrt(n)) + 1):
         if sieve[i] != i:
             continue
 
