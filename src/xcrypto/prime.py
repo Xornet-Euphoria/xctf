@@ -1,6 +1,7 @@
 from xcrypto.num_util import *
 from math import sqrt, floor
 from Crypto.Util.number import isPrime
+from factordb.factordb import FactorDB
 
 
 def is_prime(n):
@@ -33,6 +34,18 @@ def fermat_method(n):
     b = int_sqrt(b_pow_2)
 
     return (a + b, a - b)
+
+
+def factorize_by_factordb(n):
+    sc = FactorDB(n)
+    sc.connect()
+    raw_factorized = sc.get_factor_from_api()
+    ret = []
+    for factor in raw_factorized:
+        s_base, exponent = factor
+        ret.append((int(s_base), exponent))
+
+    return ret
 
 
 """
