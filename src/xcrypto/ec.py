@@ -128,7 +128,11 @@ def bsgs(G, target, order, log=False):
 
 def ec_pohlig_hellman(g, y, factorized_orders, log=False):
     order = 1
-    for t in factorized_orders:
+    for i, t in enumerate(factorized_orders):
+        if isinstance(t, int):
+            t = (t, 1)
+            factorized_orders[i] = t
+
         order *= pow(t[0], t[1])
     xs = []
     problem = []
