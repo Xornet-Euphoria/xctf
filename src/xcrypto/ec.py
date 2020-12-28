@@ -1,6 +1,7 @@
 from xcrypto.finitefield import FiniteField, Element
 from xcrypto.mod import crt
 from math import ceil, sqrt
+from Crypto.Random.random import randint
 
 
 class ECPoint:
@@ -60,6 +61,10 @@ class ECPoint:
         return self.__class__(ret_x.x, ret_y.x, self.curve)
 
     def __rmul__(self, scalar):
+        if isinstance(scalar, Element):
+            scalar = int(scalar)
+        elif not isinstance(scalar, int):
+            raise ValueError("scalar must be `int` or `Element` of `FiniteField`")
         ret = self.curve.get_o()
         twice_point = self
         while scalar > 0:
@@ -77,6 +82,7 @@ class EllipticCurve:
         self.a = Element(a, p)
         self.b = Element(b, p)
         self.p = p
+        self.order = None  # todo: calculating order
 
     def __str__(self):
         return f"y^2 = x^3 + {self.a}x + {self.b} over F_{self.p}"
@@ -86,6 +92,12 @@ class EllipticCurve:
 
     def __ne__(self, curve):
         return not (self == curve)
+
+    def set_order(self, order):
+        self.order = order
+
+    def is_order_set(self):
+        return self.order is not None
 
     def on_curve(self, point):
         _x, _y = point
@@ -99,6 +111,45 @@ class EllipticCurve:
 
     def get_o(self):
         return ECPoint(None, None, self)
+
+
+class ECDSA:
+    def __init__(self, ec: EllipticCurve, g: ECPoint, q: ECPoint, d: int=None) -> None:
+        if not ec.is_order_set():
+            raise ValueError("order is not set")
+        self.curve = ec
+        self.g = g
+        self.q = q
+
+        self.is_secret_set = False
+        if d is not None:
+            self.set_secret(d)
+            self.is_secret_set = True
+        else:
+            self.d = None
+
+    def set_secret(self, d: int) -> None:
+        self.d = Element(d, self.curve.order)
+        if d*self.g != self.q:
+            raise ValueError("invalid secret")
+
+    # z must be int
+    def sign(self, z: int) -> tuple:
+        if not self.is_secret_set:
+            raise Exception("secret is not set")
+        n = self.curve.order
+        k = Element(randint(2, n-1), n)
+        r = Element((int(k)*self.g).unpack()[0], n)
+        s = (Element(z, n) + r*self.d) / k
+
+        return (int(r), int(s))
+
+    def verify(self, r: int, s: int, z: int) -> bool:
+        n = self.curve.order
+        r, s, z = Element(r, n), Element(s, n), Element(z, n)
+        u, v = z / s, r / s
+        kg = int(u)*self.g + int(v)*self.q
+        return kg.unpack()[0] == int(r)
 
 
 def bsgs(G, target, order, log=False):
