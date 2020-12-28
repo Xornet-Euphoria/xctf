@@ -19,6 +19,9 @@ class Element:
         self.x = x % p
         self.fp = FiniteField(p)
 
+    def __int__(self):
+        return self.x
+
     def __str__(self):
         return f"{self.x}"
 
@@ -54,6 +57,14 @@ class Element:
         return self.return_same_fp(self.x - elm.x)
 
     def __mul__(self, elm):
+        if isinstance(elm, int):
+            elm = Element(elm, self.fp.p)
+        self.raise_different_field_err(elm)
+        return self.return_same_fp(self.x * elm.x)
+
+    def __rmul__(self, elm):
+        if isinstance(elm, int):
+            elm = Element(elm, self.fp.p)
         self.raise_different_field_err(elm)
         return self.return_same_fp(self.x * elm.x)
 
