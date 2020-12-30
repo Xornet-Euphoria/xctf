@@ -25,6 +25,17 @@ class Element:
     def __str__(self):
         return f"{self.x}"
 
+    def int_to_elm(self, elm):
+        if isinstance(elm, int):
+            return self.to_same_fp_elm(elm)
+        elif not isinstance(elm, Element):
+            raise ValueError("`elm` must be int or Element")
+
+        return elm
+
+    def to_same_fp_elm(self, elm):
+        return Element(elm, self.fp.p)
+
     def check_same_field(self, elm):
         return self.fp == elm.fp
 
@@ -49,26 +60,27 @@ class Element:
         return self.return_same_fp(-self.x)
 
     def __add__(self, elm):
+        elm = self.int_to_elm(elm)
         self.raise_different_field_err(elm)
         return self.return_same_fp(self.x + elm.x)
 
     def __sub__(self, elm):
+        elm = self.int_to_elm(elm)
         self.raise_different_field_err(elm)
         return self.return_same_fp(self.x - elm.x)
 
     def __mul__(self, elm):
-        if isinstance(elm, int):
-            elm = Element(elm, self.fp.p)
+        elm = self.int_to_elm(elm)
         self.raise_different_field_err(elm)
         return self.return_same_fp(self.x * elm.x)
 
     def __rmul__(self, elm):
-        if isinstance(elm, int):
-            elm = Element(elm, self.fp.p)
+        elm = self.int_to_elm(elm)
         self.raise_different_field_err(elm)
         return self.return_same_fp(self.x * elm.x)
 
     def __truediv__(self, elm):
+        elm = self.int_to_elm(elm)
         self.raise_different_field_err(elm)
         return self.return_same_fp(self.x * elm.inv().x)
 
