@@ -272,7 +272,7 @@ def recover_abp(points: list, is_p_prime: bool=False) -> tuple:
 def recover_ab(point1: tuple, point2: tuple, p: int) -> tuple:
     x1, y1 = point1
     x2, y2 = point2
-    lhs = y1**2 - y2**2 - (x1**3 - x2**3) % p
+    lhs = (y1**2 - y2**2 - (x1**3 - x2**3)) % p
     x_diff = (x1 - x2) % p
 
     a = lhs * pow(x_diff, -1, p) % p
