@@ -1,5 +1,5 @@
 from xcrypto.finitefield import FiniteField, Element
-from xcrypto.mod import crt
+from xcrypto.mod import crt, is_quadratic_residue, tonelli_shanks
 from xcrypto.num_util import list_gcd
 from xcrypto.prime import is_prime
 from math import ceil, sqrt
@@ -114,6 +114,25 @@ class EllipticCurve:
 
     def get_o(self):
         return ECPoint(None, None, self)
+
+    def is_x_valid(self, x: int) -> bool:
+        if not is_prime(self.p):
+            raise ValueError("modulo must be prime")
+        return is_quadratic_residue(self.__calc_rhs(x), self.p)
+
+    def get_y_from_x(self, x: int) -> tuple:
+        if not is_prime(self.p):
+            raise ValueError("modulo must be prime")
+
+        if not self.is_x_valid(x):
+            return tuple()
+
+        rhs = self.__calc_rhs(x)
+        return tonelli_shanks(rhs, self.p)
+
+    def __calc_rhs(self, x: int) -> int:
+        x = Element(x, self.p)
+        return int(x**3 + self.a * x + self.b)
 
 
 class ECDSA:
