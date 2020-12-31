@@ -2,20 +2,16 @@ from Crypto.Util.number import isPrime
 from xcrypto.mod import inv
 from xcrypto.rcf import to_rcf, rcf_to_frac
 
-def euler_phi(p, q):
-    if not isPrime(p) or not isPrime(q):
-        ValueError("2 number must be prime")
 
-    return (p - 1) * (q - 1)
-
-
-def dec(c, d, n):
+def dec(c: int, d: int, n: int) -> int:
     return pow(c, d, n)
 
 
-def dec_pq(c, p, q, e):
+def dec_pq(c: int, p: int, q: int, e: int) -> int:
+    if not isPrime(p) or isPrime(q):
+        raise ValueError("`p` and `q` must be a prime number")
     n = p * q
-    phi = euler_phi(p, q)
+    phi = (p-1)*(q-1)
     d = inv(e, phi)
     return dec(c, d, n)
 
