@@ -123,7 +123,7 @@ def legendre_symbol(a, p):
 
     ret = pow(a, (p-1) // 2, p)
 
-    return ret if ret == 1 else -ret
+    return ret if ret == 1 else -1
 
 
 def get_q_s(p):
