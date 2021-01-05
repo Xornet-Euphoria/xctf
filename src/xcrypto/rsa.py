@@ -8,7 +8,7 @@ def dec(c: int, d: int, n: int) -> int:
 
 
 def dec_pq(c: int, p: int, q: int, e: int) -> int:
-    if not isPrime(p) or isPrime(q):
+    if not isPrime(p) or not isPrime(q):
         raise ValueError("`p` and `q` must be a prime number")
     n = p * q
     phi = (p-1)*(q-1)
