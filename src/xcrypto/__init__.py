@@ -10,3 +10,4 @@ from .vector import *
 from .lattice import *
 from .finitefield import *
 from .ec import *
+from .hash import *
