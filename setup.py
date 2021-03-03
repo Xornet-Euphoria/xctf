@@ -7,5 +7,5 @@ setup(
     install_requires=["pycryptodome", "factordb-python"],
     package_dir={"": "src"},
     packages=find_packages("src"),
-    scripts=["scripts/make_exploit.py"]
+    scripts=["scripts/make_exploit.py", "scripts/dlp_tool.py"]
 )
