@@ -1,5 +1,5 @@
 from xcrypto.num_util import *
-from math import sqrt, floor
+from math import isqrt, sqrt, floor
 from Crypto.Util.number import isPrime
 from factordb.factordb import FactorDB
 
@@ -18,22 +18,16 @@ def is_prime(n):
     return False
 
 
-def fermat_method(n):
-    a = int_sqrt(n)
-
-    if a**2 == n:
-        return (a, a)
-
-    a += 1
-    b_pow_2 = a ** 2 - n
-
-    while not is_square(b_pow_2):
+def fermat_method(N, attempt=None):
+    a = isqrt(N) + 1
+    while attempt != 0:
+        b2 = a * a - N
+        if isqrt(b2)**2 == b2:
+            return (a - isqrt(b2), a + isqrt(b2))
         a += 1
-        b_pow_2 = a ** 2 - n
-
-    b = int_sqrt(b_pow_2)
-
-    return (a + b, a - b)
+        if attempt is not None:
+            attempt -= 1
+    return None
 
 
 def factorize_by_factordb(n):
