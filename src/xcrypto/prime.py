@@ -18,6 +18,24 @@ def is_prime(n):
     return False
 
 
+
+def next_prime(n):
+    if not isinstance(n, int):
+        raise ValueError("`n` must be a intager")
+
+    if n < 2:
+        return 2
+    if n == 2:
+        return 3
+
+    n += (n % 2 + 1)
+
+    while True:
+        if isPrime(n):
+            return n
+        n += 2
+
+
 def fermat_method(N, attempt=None):
     a = isqrt(N) + 1
     while attempt != 0:
