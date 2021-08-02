@@ -1,4 +1,4 @@
-from math import ceil, gcd
+from math import ceil, gcd, isqrt, sqrt
 from functools import reduce
 
 
@@ -43,3 +43,34 @@ def is_square(x):
     r = int_sqrt(x)
 
     return r**2 == x
+
+
+# f = ax^2 + bx + c
+def solve_quadratic_eq(a, b, c, int_sol=False):
+    discriminant = b**2 - 4*a*c
+    if discriminant < 0:
+        return ()
+
+    if int_sol:
+        sqrt_d = isqrt(discriminant)
+        if sqrt_d**2 != discriminant:
+            return ()
+
+        sol_l = []
+        for sign in [-1,1]:
+            numer = -b + sign * sqrt_d
+            denom = 2*a
+
+            if numer % denom == 0:
+                sol_l.append(numer // denom)
+
+        return sol_l
+
+    sol_l = []
+    for sign in [-1, 1]:
+        numer = -b + sign * sqrt(discriminant)
+        denom = 2*a
+
+        sol_l.append(numer / denom)
+
+    return sol_l

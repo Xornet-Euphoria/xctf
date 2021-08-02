@@ -1,6 +1,7 @@
 from Crypto.Util.number import isPrime
 from xcrypto.mod import inv
 from xcrypto.rcf import to_rcf, rcf_to_frac
+from xcrypto.num_util import solve_quadratic_eq
 
 
 def dec(c: int, d: int, n: int) -> int:
@@ -14,6 +15,24 @@ def dec_pq(c: int, p: int, q: int, e: int) -> int:
     phi = (p-1)*(q-1)
     d = inv(e, phi)
     return dec(c, d, n)
+
+
+def phi_to_pq(n: int, phi: int):
+    if n <= phi:
+        raise ValueError("phi must be (p-1)*(q-1)")
+
+    p_plus_q = n - phi + 1
+    res = solve_quadratic_eq(1, -p_plus_q, n, True)
+
+    if len(res) != 2:
+        raise ValueError("no factor is found")
+
+    p, q = res
+
+    if p*q == n:
+        return (p,q)
+
+    raise ValueError("p * q != n, Please check n is product of two prime numbers and phi is correct")
 
 
 def wiener_rcf(rcf_tuple, index):
