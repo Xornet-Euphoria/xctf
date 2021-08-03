@@ -149,7 +149,7 @@ def tonelli_shanks(a, p):
         return ()
 
     if a == 0:
-        return 0
+        return (0, )
 
     q, s = get_q_s(p)
     z = get_nonresidue(p)
