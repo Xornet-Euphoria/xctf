@@ -144,6 +144,21 @@ def get_nonresidue(p):
     return ret
 
 
+def mod_sqrt(a, p):
+    if not is_quadratic_residue(a, p):
+        return ()
+
+    if a == 0:
+        return (a, )
+
+    if (p - 3) % 4 == 0:
+        k = (p - 3) // 4
+        no_sign_sol = pow(a, -k, p)
+        return (no_sign_sol, -no_sign_sol % p)
+
+    return tonelli_shanks(a, p)
+
+
 def tonelli_shanks(a, p):
     if not is_quadratic_residue(a, p):
         return ()
