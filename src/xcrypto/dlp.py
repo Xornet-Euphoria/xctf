@@ -50,7 +50,8 @@ def pohlig_hellman(g, y, p, factorized_phi_list, log=False):
         g_i = pow(g, exp_i, p)
         y_i = pow(y, exp_i, p)
         x_i = baby_step_giant_step(g_i, y_i, p, q_e)
-        xs.append(x_i)
-        problem.append([x_i, q_e])
+        if x_i is not None:
+            xs.append(x_i)
+            problem.append([x_i, q_e])
 
     return crt(problem)
