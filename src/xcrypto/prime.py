@@ -36,13 +36,16 @@ def next_prime(n):
         n += 2
 
 
-def get_unsafe_prime(pbit, qbit=24):
+def get_unsafe_prime(pbit, qbit=24, exponents=False):
     while True:
         q_set = set()
         q_set.add(2)
         p = 2
         while True:
             q = getPrime(qbit)
+            if q in q_set:
+                continue
+            q_set.add(q)
             p *= q
             _pbit = p.bit_length()
             if _pbit > pbit:
@@ -52,13 +55,31 @@ def get_unsafe_prime(pbit, qbit=24):
         _pbit = p.bit_length()
         if _pbit < pbit:
             _bit = pbit - _pbit
-            q = getPrime(_bit)
-            p *= q
+            while True:
+                q = getPrime(_bit)
+                if q not in q_set:
+                    q_set.add(q)
+                    p *= q
+                    break
             while p.bit_length() < pbit:
                 p *= 2
 
         p += 1
         if isPrime(p):
+            if exponents:
+                phi = p - 1
+                exponents = []
+                two_count = 0
+                while phi % 2 == 0:
+                    two_count += 1
+                    phi //= 2
+
+                exponents.append((2,two_count))
+                for q in q_set:
+                    if q == 2:
+                        continue
+                    exponents.append((q,1))
+                return p, exponents
             return p
 
 
