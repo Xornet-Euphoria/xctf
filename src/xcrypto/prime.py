@@ -45,12 +45,12 @@ def get_unsafe_prime(pbit, qbit=24, exponents=False):
             q = getPrime(qbit)
             if q in q_set:
                 continue
-            q_set.add(q)
             p *= q
             _pbit = p.bit_length()
             if _pbit > pbit:
                 p //= q
                 break
+            q_set.add(q)
 
         _pbit = p.bit_length()
         if _pbit < pbit:
