@@ -1,6 +1,6 @@
 from xcrypto.num_util import *
 from math import isqrt, sqrt, floor
-from Crypto.Util.number import isPrime
+from Crypto.Util.number import isPrime, getPrime
 from factordb.factordb import FactorDB
 
 
@@ -34,6 +34,32 @@ def next_prime(n):
         if isPrime(n):
             return n
         n += 2
+
+
+def get_unsafe_prime(pbit, qbit=24):
+    while True:
+        q_set = set()
+        q_set.add(2)
+        p = 2
+        while True:
+            q = getPrime(qbit)
+            p *= q
+            _pbit = p.bit_length()
+            if _pbit > pbit:
+                p //= q
+                break
+
+        _pbit = p.bit_length()
+        if _pbit < pbit:
+            _bit = pbit - _pbit
+            q = getPrime(_bit)
+            p *= q
+            while p.bit_length() < pbit:
+                p *= 2
+
+        p += 1
+        if isPrime(p):
+            return p
 
 
 def fermat_method(N, attempt=None):
