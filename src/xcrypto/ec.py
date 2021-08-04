@@ -153,12 +153,12 @@ class EllipticCurve:
         return d == 0
 
 
-    def get_singular_point(self):
+    def get_singular_point(self) -> ECPoint:
         if not self.is_singular():
             return []
 
         # cusp
-        if self.a == 0 and self.b == 0:
+        if self.a.x == 0 and self.b.x == 0:
             return ECPoint(0, 0, self)
 
         # node
@@ -167,11 +167,25 @@ class EllipticCurve:
 
         for alpha in alphas:
             lhs = 2* alpha**3 % self.p
-            if lhs == self.p:
+            if lhs == self.b.x:
                 return ECPoint(alpha, 0, self)
 
 
-    def casp_map(self, g: ECPoint) -> int:
+    def has_node(self):
+        return self.a.x != 0 and self.a.x != 0 and self.is_singular()
+
+
+    def node_root(self):
+        if not self.has_node():
+            return ()
+
+        alpha, _ = self.get_singular_point().unpack()
+        beta = -2*alpha % self.p
+
+        return (alpha, beta)
+
+
+    def cusp_map(self, g: ECPoint) -> int:
         x,y = g.unpack()
 
         if y == 0:
@@ -180,9 +194,9 @@ class EllipticCurve:
         return x * pow(y,-1, self.p) % self.p
 
 
-    def casp_dlp(self, G: ECPoint, nG: ECPoint) -> int:
-        g = self.casp_map(G)
-        h = self.casp_map(nG)
+    def cusp_dlp(self, G: ECPoint, nG: ECPoint) -> int:
+        g = self.cusp_map(G)
+        h = self.cusp_map(nG)
 
         n = h * pow(g, -1, self.p) % self.p
 
