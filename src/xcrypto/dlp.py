@@ -55,3 +55,24 @@ def pohlig_hellman(g, y, p, factorized_phi_list, log=False):
             problem.append([x_i, q_e])
 
     return crt(problem)
+
+
+def get_order(g: int, p: int, phi_exponents) -> int:
+    phi = 1
+    for q, e in phi_exponents:
+        phi *= (q**e)
+
+    order = phi
+
+    while True:
+        is_divisor = False
+        for q, e in phi_exponents:
+            _order = order // q
+            if pow(g, _order, p) == 1:
+                order = _order
+                is_divisor = True
+
+        if not is_divisor:
+            break
+
+    return order
