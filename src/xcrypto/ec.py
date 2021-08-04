@@ -2,6 +2,7 @@ from xcrypto.finitefield import FiniteField, Element
 from xcrypto.mod import crt, is_quadratic_residue, mod_sqrt, tonelli_shanks
 from xcrypto.num_util import list_gcd
 from xcrypto.prime import is_prime
+from xcrypto.dlp import pohlig_hellman
 from math import ceil, sqrt
 from itertools import combinations
 from Crypto.Random.random import randint
@@ -185,7 +186,30 @@ class EllipticCurve:
         return (alpha, beta)
 
 
+    def node_map(self, g: ECPoint) -> int:
+        if self != g.curve:
+            raise ValueError("given point is not on curve")
+        x,y = g.unpack()
+        alpha, beta = self.node_root()
+        if not is_quadratic_residue(alpha - beta, self.p):
+            raise ValueError("Points of this curve Can't maps to F_p")
+        gamma = mod_sqrt((alpha - beta) % self.p, self.p)[0]
+        numer = (y + gamma*(x - alpha)) % self.p
+        denom = (y - gamma*(x - alpha)) % self.p
+
+        return numer * pow(denom, -1, self.p) % self.p
+
+
+    def node_dlp(self, G: ECPoint, H: ECPoint, phi_exponents, ph_log=False) -> int:
+        g = self.node_map(G)
+        h = self.node_map(H)
+
+        return pohlig_hellman(g, h, self.p, phi_exponents, ph_log)
+
+
     def cusp_map(self, g: ECPoint) -> int:
+        if self != g.curve:
+            raise ValueError("given point is not on curve")
         x,y = g.unpack()
 
         if y == 0:
