@@ -1,5 +1,5 @@
 from xcrypto.finitefield import FiniteField, Element
-from xcrypto.mod import crt, is_quadratic_residue, tonelli_shanks
+from xcrypto.mod import crt, is_quadratic_residue, mod_sqrt, tonelli_shanks
 from xcrypto.num_util import list_gcd
 from xcrypto.prime import is_prime
 from math import ceil, sqrt
@@ -133,6 +133,63 @@ class EllipticCurve:
     def __calc_rhs(self, x: int) -> int:
         x = Element(x, self.p)
         return int(x**3 + self.a * x + self.b)
+
+
+    def get_random_point(self) -> ECPoint:
+        while True:
+            x = randint(2, self.p - 1)
+            ys = self.get_y_from_x(x)
+            if len(ys) > 0:
+                return ECPoint(x, ys[0], self)
+
+
+    # for singular curve
+    def discriminant(self):
+        return (4 * self.a.x ** 3 + 27 * self.b.x ** 2) % self.p
+
+
+    def is_singular(self) -> bool:
+        d = self.discriminant()
+        return d == 0
+
+
+    def get_singular_point(self):
+        if not self.is_singular():
+            return []
+
+        # cusp
+        if self.a == 0 and self.b == 0:
+            return ECPoint(0, 0, self)
+
+        # node
+        rhs = self.a.x * pow(-3, -1, self.p) % self.p
+        alphas = mod_sqrt(rhs, self.p)
+
+        for alpha in alphas:
+            lhs = 2* alpha**3 % self.p
+            if lhs == self.p:
+                return ECPoint(alpha, 0, self)
+
+
+    def casp_map(self, g: ECPoint) -> int:
+        x,y = g.unpack()
+
+        if y == 0:
+            raise ValueError("g is singular point")
+
+        return x * pow(y,-1, self.p) % self.p
+
+
+    def casp_dlp(self, G: ECPoint, nG: ECPoint) -> int:
+        g = self.casp_map(G)
+        h = self.casp_map(nG)
+
+        n = h * pow(g, -1, self.p) % self.p
+
+        if n*G != nG:
+            raise ValueError("solution is wrong. Please check curve has cusp")
+
+        return n
 
 
 class ECDSA:
