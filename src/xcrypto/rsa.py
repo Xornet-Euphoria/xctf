@@ -22,6 +22,11 @@ def phi_to_pq(n: int, phi: int):
         raise ValueError("phi must be (p-1)*(q-1)")
 
     p_plus_q = n - phi + 1
+
+    return p_plus_q_to_pq(n, p_plus_q)
+
+
+def p_plus_q_to_pq(n: int, p_plus_q: int) -> tuple:
     res = solve_quadratic_eq(1, -p_plus_q, n, True)
 
     if len(res) != 2:
