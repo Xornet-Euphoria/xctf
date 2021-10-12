@@ -22,6 +22,8 @@ def frac_ceil(numerator: int, denominator: int) -> int:
 
 # return integer number less than or equal to pow(x, (1/n))
 def int_nth_root(x, n):
+    if n == 2:
+        return isqrt(x)
     b_length = x.bit_length()
     ret_ceil = pow(2, ceil(b_length / n))
     ret_range = [1, ret_ceil]
