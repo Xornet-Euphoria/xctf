@@ -4,7 +4,6 @@
 
 * python 3.8 or higher
 * pycryptodome
-* factordb-python
 
 ## install
 

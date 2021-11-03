@@ -1,7 +1,9 @@
 from xcrypto.num_util import *
 from math import isqrt, sqrt, floor
 from Crypto.Util.number import isPrime, getPrime
-from factordb.factordb import FactorDB
+from typing import List, Tuple
+import requests
+import json
 
 
 def is_prime(n):
@@ -95,16 +97,36 @@ def fermat_method(N, attempt=None):
     return None
 
 
-def factorize_by_factordb(n):
-    sc = FactorDB(n)
-    sc.connect()
-    raw_factorized = sc.get_factor_from_api()
+# def factorize_by_factordb(n):
+#     sc = FactorDB(n)
+#     sc.connect()
+#     raw_factorized = sc.get_factor_from_api()
+#     ret = []
+#     for factor in raw_factorized:
+#         s_base, exponent = factor
+#         ret.append((int(s_base), exponent))
+
+#     return ret
+
+
+def factorize_by_factordb(n: int, only_ff: bool=False) -> List[Tuple[int, int]]:
+    url = "http://factordb.com/api"
+    query = f"{url}?query={n}"
+    r = requests.get(query)
+    if r.status_code != 200:
+        raise ConnectionError
+
+    res = json.loads(r.text)
+    if only_ff and res["status"] != "FF":
+        return []  # todo: consider raising error or using result.py
+
+    raw_factors = res["factors"]
     ret = []
-    for factor in raw_factorized:
-        s_base, exponent = factor
-        ret.append((int(s_base), exponent))
+    for f, e in raw_factors:
+        ret.append((int(f), e))
 
     return ret
+
 
 
 """
