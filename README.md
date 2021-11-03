@@ -2,7 +2,7 @@
 
 ## Prerequisite
 
-* python 3.8
+* python 3.8 or higher
 * pycryptodome
 * factordb-python
 
@@ -28,3 +28,7 @@ optional arguments:
   --host HOST           target address
   -p PORT, --port PORT  target port
 ```
+
+## License
+
+MIT
