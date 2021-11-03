@@ -4,6 +4,7 @@
 
 * python 3.8 or higher
 * pycryptodome
+* requests
 
 ## install
 
