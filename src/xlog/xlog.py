@@ -10,7 +10,7 @@ class XLog():
         logging.CRITICAL: "!!!",
     }
 
-    def __init__(self, name="X-log", level=None):
+    def __init__(self, name="X-log", level=None, *, filename: str | None=None):
         self.logger = logging.getLogger(name)
 
         # level handling
@@ -31,7 +31,7 @@ class XLog():
         self.logger.setLevel(self.level)
 
         # create console handler and set level to debug
-        self.ch = logging.StreamHandler()
+        self.ch = logging.StreamHandler() if filename is None else logging.FileHandler(filename)
         self.ch.setLevel(self.level)
 
         # create formatter
