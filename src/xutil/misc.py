@@ -1,3 +1,6 @@
+import os
+
+
 def conn_info(s: str):
     raw_l = s.split(" ")
     if len(raw_l) < 2:
@@ -15,3 +18,12 @@ def conn_info(s: str):
         raise ValueError("port must be a number")
 
     return (host, port)
+
+
+def pid_print(attach: bool=False):
+    pid = os.getpid()
+    print(f"[+] pid: {pid}")
+
+    if attach:
+        print(f"[+] Waiting for attach: `attach {pid}`")
+        input("> ")
